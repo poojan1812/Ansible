@@ -1,0 +1,51 @@
+- hosts: DockerSlave
+  vars_files:
+    - secret.yml
+  tasks:
+    - name: yum configuration in slave system
+      yum_repository:
+        name: DockerRepo
+        baseurl: https://download.docker.com/linux/centos/7/x86_64/stable/
+        description: docker repo
+        enabled: true
+        gpgcheck: no
+
+    - name: Docker installation
+      command: "yum install docker-ce --nobest -y"
+
+    - name: Start docker services
+      service:
+        name: "docker"
+        state: started
+        enabled: yes
+
+    - name: Install python36 package
+      package:
+        name: python36
+        state: present
+
+    - name: Install python library for docker
+      pip:
+        name: docker-py
+
+    - name: Pull docker image
+      docker_image:
+        name: httpd:latest
+        source: pull
+
+    - name: Clone code from GitHub
+      git:
+        repo: "https://{{gituser}}:{{gitpass}}@github.com/poojan1812/hybrid-cloud.git"
+        dest: "/root/code_html/"
+
+    - name: Launch container
+      docker_container:
+        name: img_httpd
+        image: httpd:latest
+        state: started
+        exposed_ports:
+          - "80"
+        ports:
+          - "2025:80"
+        volumes:
+          - /root/code_html:/usr/local/apache2/htdocs/
