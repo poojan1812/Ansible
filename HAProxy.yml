@@ -1,0 +1,17 @@
+# Tasks file for loadBalanacer
+# Assuming haproxy.cfg file is configured
+
+           - name: Download haproxy package
+             package:
+                 name:
+                    - haproxy
+
+           - name: Copy the config file to remote system
+             template:
+                     src: "haproxy.cfg"
+                     dest: "/etc/haproxy/haproxy.cfg"
+
+           - name: Start service
+             service:
+                     name: "haproxy"
+                     state: restarted
