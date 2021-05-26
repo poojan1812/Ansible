@@ -23,14 +23,13 @@
        var: ec2.instances[0].public_ip
 
 ===== extra =====
-
    - name: Adding the instance in host group
      add_host:
        hostname: "{{ item.public_ip }}"
        groupname: ec2Group
      with_items: "{{ ec2.instances }}"
 
-   - name: Configuring SSH
+   - name: Wait till configuration of SSH
      wait_for:
         host: "{{ item.public_ip }}"
         port: 22
